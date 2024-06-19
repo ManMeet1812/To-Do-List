@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To_Do_List</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100%;
+            background-color: #453953;
+        }
+
+        h1{
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 3rem;
+            color: #975a5e;
+            /* margin: 20px 20px; */
+            margin-top: 85px;
+        }
+
+        .todo-lists-elem{
+            max-height: 300px;
+            overflow-y: auto;
+            width: 100%;
+            margin: 20px 20px;
+            padding: 0 10px;   
+        }
+
+        .todo{
+            display: flex;
+            flex-direction:row;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button{
+            border-radius: 5px;
+            border: none;
+            padding: 8px 10px;
+            margin: 20px;
+            background-color: #f3cba5;
+            font-size: 1.2rem;
+            color: #975a5e;
+            cursor: pointer;
+            font-family:'Courier New', Courier, monospace;
+        }
+
+        button:hover{
+            color: #453953;
+        }
+
+        input[type="text"]{
+            width: 280px;
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid #975a5e;
+            border-radius: 5px;
+            color: #453953;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .main_todo_div{
+            /* width: 36rem; */
+            display: grid;
+            grid-template-columns: 1fr 0.3fr;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: fit-content;
+        }
+
+        .main_todo_div li{
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.8rem;
+            color: #975a5e;
+            list-style: none;
+        }
+
+        button.deleteBtn{
+            padding: 3px 10px;
+            margin: 7px 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Todo List</h1>
+    <br />
+    <form>
+        <div id="todo">
+            <input type="text" id="inputValue">
+            <button class="btn">Add Todo</button>
+        </div>
+        <section class="todo-lists-elem"></section>
+    </form>
+
+    <script>
+        const mainTodoElem = document.querySelector(".todo-lists-elem");
+        const inputValue = document.getElementById("inputValue");  
+
+        const getTodoListFromLocal = () => {
+            return JSON.parse(localStorage.getItem("youtubeTodoList"));
+        };
+
+        const addTodoListLocalStorage = () => {
+            return localStorage.setItem("youtubeTodoList", JSON.stringify(localTodoLists));
+        };
+
+        let localTodoLists = getTodoListFromLocal() || [];
+
+        const addTodoDynamicElement = (curElem) =>{
+            const divElement = document.createElement("div");
+            divElement.classList.add("main_todo_div");
+            divElement.innerHTML = `<li> ${curElem} </li> <button class= "deleteBtn">Delete</button>`;
+            mainTodoElem.append(divElement);
+        }
+
+        const addTodoList = (e) => {
+            e.preventDefault();
+            // console.log("testing")
+             
+            const todoListValue = inputValue.value.trim();
+
+            inputValue.value = "";
+
+            if(todoListValue != "" && !localTodoLists.includes(todoListValue)){
+                localTodoLists.push(todoListValue);
+            localTodoLists = [...new Set(localTodoLists)];
+            console.log(localTodoLists);
+            localStorage.setItem('youtubeTodoList', JSON.stringify(localTodoLists));
+
+            addTodoDynamicElement(inputValue.value);
+            };
+        }
+           
+        const showTodoList = () =>{
+            console.log(localTodoLists);
+
+            localTodoLists.forEach((curElem) => {
+                addTodoDynamicElement(curElem);
+            });
+        };
+
+        showTodoList();
+
+        const removeTodoElem = (e) => {
+            // console.log(e.target);
+            const todoToRemove = e.target;
+            let todoListContent = todoToRemove.previousElementSibling.innerText;
+            let parentElem = todoToRemove.parentElement;
+            console.log(todoListContent);
+
+            localTodoLists = localTodoLists.filter((curTodo) =>{
+                // return curTodo != todoListContent.toLowerCase();
+                return curTodo != todoListContent;
+            });
+
+            addTodoListLocalStorage(localTodoLists);
+            parentElem.remove();
+
+            console.log(localTodoLists);
+
+        };
+
+        mainTodoElem.addEventListener("click", (e) =>{
+            e.preventDefault();
+            if(e.target.classList.contains("deleteBtn")){
+                removeTodoElem(e);
+            }
+        })
+
+        document.querySelector(".btn").addEventListener("click", (e) => {
+            // console.log(e.target.classList.contains("deleteBtn"));
+            
+                addTodoList(e);
+           
+            
+        });
+
+    </script>
+</body>
+</html>
